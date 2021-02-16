@@ -9,7 +9,7 @@ import (
 
 // ConvertImage converts images to text.
 // Requires gosseract (ocr build tag).
-func ConvertImage(r io.Reader) (string, map[string]string, error) {
+func ConvertImage(io.Reader) (string, map[string]string, error) {
 	return "", nil, fmt.Errorf("docconv not built with `ocr` build tag")
 }
 
