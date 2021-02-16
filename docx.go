@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -63,10 +64,11 @@ func ConvertDocx(r io.Reader) (string, map[string]string, error) {
 	meta := make(map[string]string)
 	var textHeader, textBody, textFooter string
 	for _, override := range contentTypeDefinition.Overrides {
-		f := zipFiles[override.PartName]
+		name := strings.TrimLeft(override.PartName, "/")
+		f := zipFiles[name]
 
-		switch {
-		case override.ContentType == "application/vnd.openxmlformats-package.core-properties+xml":
+		switch override.ContentType {
+		case "application/vnd.openxmlformats-package.core-properties+xml":
 			rc, err := f.Open()
 			if err != nil {
 				return "", nil, fmt.Errorf("error opening '%v' from archive: %v", f.Name, err)
@@ -88,19 +90,19 @@ func ConvertDocx(r io.Reader) (string, map[string]string, error) {
 					meta["CreatedDate"] = fmt.Sprintf("%d", t.Unix())
 				}
 			}
-		case override.ContentType == "application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml":
+		case "application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml":
 			body, err := parseDocxText(f)
 			if err != nil {
 				return "", nil, err
 			}
 			textBody += body + "\n"
-		case override.ContentType == "application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml":
+		case "application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml":
 			footer, err := parseDocxText(f)
 			if err != nil {
 				return "", nil, err
 			}
 			textFooter += footer + "\n"
-		case override.ContentType == "application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml":
+		case "application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml":
 			header, err := parseDocxText(f)
 			if err != nil {
 				return "", nil, err
@@ -127,10 +129,9 @@ func getContentTypeDefinition(zf *zip.File) (*contentTypeDefinition, error) {
 }
 
 func mapZipFiles(files []*zip.File) map[string]*zip.File {
-	filesMap := make(map[string]*zip.File, 2*len(files))
+	filesMap := make(map[string]*zip.File, len(files))
 	for _, f := range files {
 		filesMap[f.Name] = f
-		filesMap["/"+f.Name] = f
 	}
 	return filesMap
 }

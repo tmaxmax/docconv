@@ -51,7 +51,8 @@ func ConvertPptx(r io.Reader) (string, map[string]string, error) {
 	meta := make(map[string]string)
 	var textBody string
 	for _, override := range contentTypeDefinition.Overrides {
-		f := zipFiles[override.PartName]
+		name := strings.TrimLeft(override.PartName, "/")
+		f := zipFiles[name]
 
 		switch override.ContentType {
 		case "application/vnd.openxmlformats-officedocument.presentationml.slide+xml",
