@@ -170,7 +170,7 @@ func TestReaderReset(t *testing.T) {
 }
 
 func TestWriterReset(t *testing.T) {
-	// FIXME: Failing due to changes to accomodate .pages files, need ot update the tests!
+	// FIXME: Failing due to changes to accomodate .pages files, need to update the tests!
 	t.Skipf("Failing due to corrupt input - needs to be fixed.")
 
 	gold := bytes.Repeat([]byte("Not all those who wander are lost;\n"), 10000)
