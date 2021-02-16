@@ -1,60 +1,62 @@
 package docconv
 
 import (
-	"archive/zip"
-	"bufio"
-	"bytes"
-	"encoding/binary"
-	"fmt"
 	"io"
-	"io/ioutil"
-	"strings"
-
-	"github.com/golang/protobuf/proto"
-
-	"code.sajari.com/docconv/iWork"
-	"code.sajari.com/docconv/snappy"
 )
 
 // ConvertPages converts a Pages file to text.
-func ConvertPages(r io.Reader) (string, map[string]string, error) {
-	meta := make(map[string]string)
-	var textBody string
+func ConvertPages(r io.Reader) (textBody string, meta map[string]string, err error) {
+	panic("ConvertPages is not implemented!")
 
-	b, err := ioutil.ReadAll(r)
-	if err != nil {
-		return "", nil, fmt.Errorf("error reading data: %v", err)
-	}
-
-	zr, err := zip.NewReader(bytes.NewReader(b), int64(len(b)))
-	if err != nil {
-		return "", nil, fmt.Errorf("error unzipping data: %v", err)
-	}
-
-	for _, f := range zr.File {
-		if strings.HasSuffix(f.Name, "Preview.pdf") {
-			// There is a preview PDF version we can use
-			if rc, err := f.Open(); err == nil {
-				return ConvertPDF(rc)
-			}
-		}
-		if f.Name == "index.xml" {
-			// There's an XML version we can use
-			if rc, err := f.Open(); err == nil {
-				return ConvertXML(rc)
-			}
-		}
-		if f.Name == "Index/Document.iwa" {
-			rc, _ := f.Open()
-			defer rc.Close()
-			bReader := bufio.NewReader(snappy.NewReader(io.MultiReader(strings.NewReader("\xff\x06\x00\x00sNaPpY"), rc)))
-			archiveLength, err := binary.ReadVarint(bReader)
-			archiveInfoData, err := ioutil.ReadAll(io.LimitReader(bReader, archiveLength))
-			archiveInfo := &TSP.ArchiveInfo{}
-			err = proto.Unmarshal(archiveInfoData, archiveInfo)
-			fmt.Println("archiveInfo:", archiveInfo, err)
-		}
-	}
-
-	return textBody, meta, nil
+	//prefix := util.NewErrorPrefixer("ConvertPages")
+	//b := &bytes.Buffer{}
+	//size, err := b.ReadFrom(r)
+	//if err != nil {
+	//	err = prefix(err, "failed to read")
+	//	return
+	//}
+	//
+	//zr, err := zip.NewReader(bytes.NewReader(b.Bytes()), size)
+	//if err != nil {
+	//	err = prefix(err, "failed to unzip data")
+	//	return
+	//}
+	//
+	//for _, f := range zr.File {
+	//	var r io.ReadCloser
+	//	r, err = f.Open()
+	//	if err != nil {
+	//		err = prefix(err, "failed to open file")
+	//		return
+	//	}
+	//	defer util.HandleCloseError(prefix(r.Close(), "failed to close file"), &err)
+	//	switch {
+	//	case strings.HasSuffix(f.Name, "Preview.pdf"):
+	//		return ConvertPDF(r)
+	//	case f.Name == "index.xml":
+	//		return ConvertXML(r)
+	//	case f.Name == "Index/Document.iwa":
+	//		var (
+	//			archiveLength int64
+	//			archiveInfoData []byte
+	//		)
+	//		bReader := bufio.NewReader(snappy.NewReader(io.MultiReader(strings.NewReader("\xff\x06\x00\x00sNaPpY"), r)))
+	//		archiveLength, err = binary.ReadVarint(bReader)
+	//		if err != nil {
+	//			err = prefix(err, "failed to read Document.iwa archive length")
+	//			return
+	//		}
+	//		archiveInfoData, err = ioutil.ReadAll(io.LimitReader(bReader, archiveLength))
+	//		if err != nil {
+	//			err = prefix(err, "failed to read Document.iwa")
+	//			return
+	//		}
+	//		archiveInfo := TSP.ArchiveInfo{}
+	//		if err = proto.Unmarshal(archiveInfoData, &archiveInfo); err != nil {
+	//			err = prefix(err, "failed to unmarshal archive data")
+	//			return
+	//		}
+	//	}
+	//}
+	//return
 }
